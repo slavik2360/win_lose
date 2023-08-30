@@ -29,7 +29,7 @@ class Bet(models.Model):
         max_length=200,
         choices=Games.choices
     )
-    amout: float = models.DecimalField(
+    amount: float = models.DecimalField(
         verbose_name='сумма',
         max_digits=11,
         decimal_places=2
@@ -53,19 +53,27 @@ class Bet(models.Model):
         verbose_name_plural = 'Ставки'
 
     def win(self) -> None:
-        ...
+        win_bet = self.amount * self.coef
+        Transaction.objects.create(
+            user=self.who,
+            amount=win_bet,
+            is_filled=True
+        )
 
     def lose(self) -> None:
-        ...
+        Transaction.objects.create(
+            user=self.who,
+            amount=self.amount
+        )
 
     def save(self, *args, **kwargs) -> None:
         Transaction.objects.create(
             user=self.who,
-            amout=self.amout
+            amount=self.amount
         )
         return super().save(*args, **kwargs)
     
     def clean(self) -> None:
-        if self.who.balance <= self.amout:
+        if self.who.balance <= self.amount:
             raise ValidationError('Не хватает денег!')
         return super().clean()

@@ -79,9 +79,10 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         result: float = 0
         for trans in transactions:
             if trans.is_filled:
-                result += trans.amout
+                result += trans.amount
             else:
-                result -= trans.amout
+                result -= trans.amount
+        print(result, "->>balance")
         return result
 
     REQUIRED_FIELDS = []
@@ -101,7 +102,7 @@ class Transaction(models.Model):
         on_delete=models.PROTECT
 
     )
-    amout = models.DecimalField(
+    amount = models.DecimalField(
         verbose_name='сумма',
         max_digits=11,
         decimal_places=2
@@ -111,7 +112,7 @@ class Transaction(models.Model):
         auto_now_add=True,
     )
     is_filled = models.BooleanField(
-        verbose_name='пополнение',
+        verbose_name='пополнение?',
         default=False
     )
 
